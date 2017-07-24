@@ -13,6 +13,10 @@ let recipeSchema = mongoose.Schema({
   body:{
     type: String,
     required: true
+  },
+  fileUpload: {
+    type: String,
+    required: true
   }
 });
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {ObjectID} = require('mongodb');
+const _ = require('lodash');
 
 // Models
 let Recipe = require('../models/recipe');
@@ -10,7 +11,6 @@ router.get('/:id', (req, res) => {
   let id = req.params.id;
 
   if(!ObjectID.isValid(id)) {
-    // консоль лог!? переписать!!!
     console.log("ID isn't valid");
     return res.status(404).send();
   }
@@ -25,6 +25,7 @@ router.get('/:id', (req, res) => {
   }).catch((err) => {
     res.status(400).send();
   });
+  
 });
 
 //GET all recipes
@@ -41,6 +42,7 @@ router.post('/add', (req, res) => {
   req.checkBody('title','Title is required').notEmpty();
   req.checkBody('author','Author is required').notEmpty();
   req.checkBody('body','Recipe is required').notEmpty();
+  req.checkBody('fileUpload','Image is required').notEmpty();
 
   //Get Errors
   let errors = req.validationErrors();
@@ -48,21 +50,65 @@ router.post('/add', (req, res) => {
   if(errors) {
     res.status(400).send(errors);
   } else {
-    let recipe = new Recipe({
-      title: req.body.title,
-      author: req.body.author,
-      body: req.body.body
-    });
 
-    recipe.save().then((doc) => {
+  let recipe = new Recipe({
+    title: req.body.title,
+    author: req.body.author,
+    body: req.body.body,
+    fileUpload: req.body.fileUpload
+  });
+
+  recipe.save().then((doc) => {
       res.send(doc);
-      req.flash('success', 'Recipe Added');
-      // надо ли оставлять редирект? 
-      res.redirect('/');
+
     }, (err) => {
       res.status(400).send(err)
     });
   }
 });
+
+// DELETE route 
+router.delete('/:id', (req, res) => {
+  let id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send()
+  }
+
+  Recipe.findOneAndRemove({
+    _id: id,
+  }).then((recipe) => {
+    if (!recipe) {
+      return res.status(404).send();
+    }
+
+    res.send({recipe});
+  }).catch((err) => {
+    res.status(400).send();
+  });
+});
+
+// PATCH route
+router.patch('/:id', (req, res) => {
+  let id = req.params.id;
+  let body = _.pick(req.body, ['title', 'author', 'body']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Recipe.findOneAndUpdate({
+    _id: id,
+  }, {$set: body}, {new: true}).then((recipe) => {
+    if(!recipe) {
+      return res.status(404).send()
+    }
+
+    res.send({recipe});
+  }).catch((err) => {
+    res.status(400).send();
+  });
+});
+
 
 module.exports = router;

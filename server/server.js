@@ -3,10 +3,12 @@ require('./config/config.js');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const expressValidator = require('express-validator');
 const flash = require('connect-flash');
 const session = require('express-session');
 const {ObjectID} = require('mongodb');
+
 
 
 let {mongoose} = require('./db/mongoose');
@@ -29,8 +31,8 @@ const port = process.env.PORT;
 // Models
 let Recipe = require('./models/recipe');
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'pug');
 
 // Body Parser Middleware
 // parse application/x-www-form-urlencoded
@@ -38,8 +40,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
+// CORS
+app.use(cors()); 
 // set up public folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Express Session Middleware
 app.use(session({
