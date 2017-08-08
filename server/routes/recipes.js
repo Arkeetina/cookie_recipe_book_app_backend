@@ -89,11 +89,12 @@ router.delete('/:id', (req, res) => {
 });
 
 // PATCH route
-router.patch('/:id', (req, res) => {
+router.patch('/:id/edit', (req, res) => {
   let id = req.params.id;
-  let body = _.pick(req.body, ['title', 'author', 'body']);
+  let body = _.pick(req.body, ['title', 'author', 'body', 'fileUpload']);
 
   if (!ObjectID.isValid(id)) {
+    console.log('id isnt valid');
     return res.status(404).send();
   }
 
@@ -101,11 +102,13 @@ router.patch('/:id', (req, res) => {
     _id: id,
   }, {$set: body}, {new: true}).then((recipe) => {
     if(!recipe) {
+      console.log('error is in recipe');
       return res.status(404).send()
     }
 
     res.send({recipe});
   }).catch((err) => {
+    console.log('something else');
     res.status(400).send();
   });
 });
