@@ -1,4 +1,5 @@
 /.eslintrc.js
 /node_modules
 /yarn.lock
-/server/config
+/server/config/config.js
+/server/config/config.json
