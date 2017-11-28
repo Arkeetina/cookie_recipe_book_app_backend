@@ -1,0 +1,12 @@
+{
+    "test": {
+        "PORT": 3000,
+        "MONGODB_URI": "mongodb://localhost:27017/RecipeAppTest",
+        "JWT_SECRET": "jdfoiejfij@dvnkkhjkh##llljf44llklm56mnnlkm"
+    },
+    "development": {
+        "PORT": 3000,
+        "MONGODB_URI": "mongodb://localhost:27017/RecipeApp",
+        "JWT_SECRET": "s9043dokss89*5$nnnfds343djflgl5erhjdklxlddel[p"
+    }
+}
