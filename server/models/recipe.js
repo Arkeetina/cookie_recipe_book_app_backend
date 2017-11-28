@@ -1,4 +1,5 @@
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const shortid = require('shortid');
 
 // Recipe Schema
 let recipeSchema = mongoose.Schema({

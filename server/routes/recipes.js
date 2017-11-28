@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
+const {authenticate} = require('../middleware/authenticate');
 
 // Models
 let Recipe = require('../models/recipe');
@@ -11,19 +12,18 @@ router.get('/:id', (req, res) => {
   let id = req.params.id;
 
   if(!ObjectID.isValid(id)) {
-    console.log("ID isn't valid");
-    return res.status(404).send();
+    return res.status(404).send({error: "ID isn't valid"});
   }
 
   Recipe.findOne({
     _id: id
   }).then((recipe) => {
     if(!recipe){
-      return res.status(404).send();
+      return res.status(404).send({error: "Recipe not found"});
     }
     res.status(200).send({recipe});
   }).catch((err) => {
-    res.status(400).send();
+    res.status(400).send({error: "400"});
   });
   
 });
@@ -33,12 +33,12 @@ router.get('/', (req, res) => {
   Recipe.find().then((recipes) => {
     res.send({recipes});
   }, (err) => {
-    res.status(400).send(err);
+    res.status(400).send({error: "Bad request"});
   })
 });
 
 // Add Submit POST Route
-router.post('/add', (req, res) => {
+router.post('/add', authenticate, (req, res) => {
   req.checkBody('title','Title is required').notEmpty();
   req.checkBody('author','Author is required').notEmpty();
   req.checkBody('body','Recipe is required').notEmpty();
@@ -50,46 +50,44 @@ router.post('/add', (req, res) => {
   if(errors) {
     res.status(400).send(errors);
   } else {
-
-  let recipe = new Recipe({
-    title: req.body.title,
-    author: req.body.author,
-    body: req.body.body,
-    fileUpload: req.body.fileUpload
+    let recipe = new Recipe({
+      title: req.body.title,
+      author: req.body.author,
+      body: req.body.body,
+      fileUpload: req.body.fileUpload
   });
 
   recipe.save().then((doc) => {
-      res.send(doc);
-
-    }, (err) => {
-      res.status(400).send(err)
+    res.send(doc);
+  }, (err) => {
+      res.status(400).send({error: "Bad request"})
     });
   }
 });
 
 // DELETE route 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticate, (req, res) => {
   let id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send()
+    return res.status(404).send({error: "ID isn't valid"})
   }
 
   Recipe.findOneAndRemove({
     _id: id,
   }).then((recipe) => {
     if (!recipe) {
-      return res.status(404).send();
+      return res.status(404).send({error: "Recipe not found"});
     }
 
     res.send({recipe});
   }).catch((err) => {
-    res.status(400).send();
+    res.status(400).send(err);
   });
 });
 
 // PATCH route
-router.patch('/:id/edit', (req, res) => {
+router.patch('/:id/edit', authenticate, (req, res) => {
   let id = req.params.id;
   let body = _.pick(req.body, ['title', 'author', 'body', 'fileUpload']);
 
@@ -108,8 +106,7 @@ router.patch('/:id/edit', (req, res) => {
 
     res.send({recipe});
   }).catch((err) => {
-    console.log('something else');
-    res.status(400).send();
+    res.status(400).send(err);
   });
 });
 

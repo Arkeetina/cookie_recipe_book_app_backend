@@ -9,8 +9,6 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const {ObjectID} = require('mongodb');
 
-
-
 let {mongoose} = require('./db/mongoose');
 let db = mongoose.connection;
 
@@ -30,9 +28,7 @@ const port = process.env.PORT;
 
 // Models
 let Recipe = require('./models/recipe');
-
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
+let {Admin} = require('./models/admin');
 
 // Body Parser Middleware
 // parse application/x-www-form-urlencoded
@@ -42,22 +38,6 @@ app.use(bodyParser.json());
 
 // CORS
 app.use(cors()); 
-// set up public folder
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Express Session Middleware
-app.use(session({
-  secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-}));
-
-// Express Messages Middleware
-app.use(require('connect-flash')());
-app.use( (req, res, next) => {
-  res.locals.messages = require('express-messages')(req, res);
-  next();
-});
 
 // Express Validator Middleware
 app.use(expressValidator({
@@ -80,7 +60,8 @@ app.use(expressValidator({
 // Routes files
 let recipes = require('./routes/recipes');
 app.use('/recipes', recipes);
-
+let admin = require('./routes/admin');
+app.use('/admin', admin);
 //
 app.listen(port, () => {
   console.log(`Listening on the port ${port}`);
