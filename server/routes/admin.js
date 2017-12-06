@@ -8,18 +8,18 @@ const {authenticate} = require('../middleware/authenticate');
 let {Admin} = require('../models/admin');
 
 // Registration route 
-router.post('/register', (req, res) => {
-  let body = _.pick(req.body, ['email', 'password']);
-  let admin = new Admin(body);
+// router.post('/register', (req, res) => {
+//   let body = _.pick(req.body, ['email', 'password']);
+//   let admin = new Admin(body);
 
-  admin.save().then(() => {
-    return admin.generateAuthToken();
-  }).then((token) => {
-    res.header('x-auth', token).send(admin);
-  }).catch((err) => {
-    res.status(400).send(err);
-  })
-});
+//   admin.save().then(() => {
+//     return admin.generateAuthToken();
+//   }).then((token) => {
+//     res.header('x-auth', token).send(admin);
+//   }).catch((err) => {
+//     res.status(400).send(err);
+//   })
+// });
 
 //Login route
 router.post('/login', (req, res) => {
